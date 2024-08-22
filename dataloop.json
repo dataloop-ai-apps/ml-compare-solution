@@ -1,0 +1,78 @@
+{
+    "displayName": "ML Comparison Example",
+    "name": "ml-compare-example",
+    "description": "Successful cultivation of maize depends largely on the efficacy of weed control. Weed control during the first six to eight weeks after planting is crucial, because weeds compete vigorously with the crop for nutrients and water during this period. Annual yield losses occur as a result of weed infestations in cultivated crops. Crop yield losses that are attributable to weeds vary with type of weed, type of crop, and the environmental conditions involved. Generally, depending on the level of weed control practiced yield losses can vary from 10 to 100 %. Rarely does one experience zero yield loss due to weeds... Yield losses occur as a result of weed interference with the crop's growth and development....This explains why effective weed control is imperative. In order to do effective control the first critical requirement is correct weed identification",
+    "scope": "public",
+    "version": "0.0.5",
+    "attributes": {
+        "Category": "Dataset",
+        "Hub": "Dataloop",
+        "Media Type": ["Image"],
+        "Annotation Type": ["Classification"],
+        "Computer Vision": "Classification",
+        "License": "CC BY-SA 4.0"
+    },
+    "components": {
+        "computeConfigs": [
+            {
+                "name": "dataset-deploy",
+                "runtime": {
+                    "podType": "regular-xs",
+                    "concurrency": 10,
+                    "autoscaler": {
+                        "type": "rabbitmq",
+                        "minReplicas": 0,
+                        "maxReplicas": 1,
+                        "queueLength": 100
+                    }
+                }
+            }
+        ],
+        "modules": [
+            {
+                "name": "dataset-adapter",
+                "entryPoint": "loader.py",
+                "className": "Loader",
+                "computeConfig": "dataset-deploy",
+                "description": "Dataset adapter for Kaggle Dataset",
+                "initInputs": [],
+                "functions": [
+                    {
+                        "name": "run",
+                        "input": [
+                            {
+                                "type": "Dataset",
+                                "name": "dataset",
+                                "description": "Dataloop Dataset Entity"
+                            },
+                            {
+                                "type": "String",
+                                "name": "source",
+                                "description": "Dataset source URL"
+                            }
+                        ],
+                        "output": [],
+                        "displayName": "upload_dataset",
+                        "displayIcon": "",
+                        "description": "function to upload dataset to Dataloop"
+                    }
+                ]
+            }
+        ],
+        "datasets": [
+            {
+                "name": "V2 Plant Seedlings Dataset",
+                "docs": "https://www.kaggle.com/datasets/vbookshelf/v2-plant-seedlings-dataset",
+                "source": "https://www.kaggle.com/datasets/vbookshelf/v2-plant-seedlings-dataset",
+                "invoke": {
+                    "namespace": "dataset-adapter.run"
+                }
+            }
+        ]
+    },
+    "dependencies": [
+        {
+            "name": "resnet"
+        }
+    ]
+}
