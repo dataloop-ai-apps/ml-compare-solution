@@ -40,15 +40,18 @@ class Loader:
                                     to_directory=data_dir)
             if progress:
                 progress.update(message="Uploading dataset")
-            self.upload_dataset(dataset=dataset, data_path=data_dir)
+            self.upload_dataset(dataset=dataset,
+                                data_path=data_dir,
+                                progress=progress)
             if progress:
                 progress.update(message="Creating models")
             self.clone_models(dataset=dataset,
                               metrics_path=os.path.join(data_dir, 'metrics'),
-                              weight_filepath=tmp_weights_path)
+                              weight_filepath=tmp_weights_path,
+                              progress=progress)
 
     @staticmethod
-    def upload_dataset(data_path, dataset: dl.Dataset):
+    def upload_dataset(data_path, dataset: dl.Dataset, progress: dl.Progress):
         ontology_json_folder_path = os.path.join(data_path, 'ontology')
         items_folder_path = os.path.join(data_path, 'items')
         annotation_jsons_folder_path = os.path.join(data_path, 'json')
@@ -89,11 +92,24 @@ class Loader:
                                 local_annotations_path=str(annotation_file),
                                 remote_path=remote_path,
                                 item_metadata=item_metadata))
+
+        # Upload
+        last_action_value = None
+
+        def progress_callback(kwargs):
+            p = kwargs.get('progress')  # p is between 0-100
+            global last_action_value
+            progress_int = round(p / 10) * 10  # round to 10th
+            if progress_int % 10 == 0 and progress_int != last_action_value:
+                progress.update(progress=80 * progress_int / 100)
+                last_action_value = progress_int
+
+        dl.client_api.callbacks.add(event='itemUpload', func=progress_callback)
         dataset.items.upload(local_path=pd.DataFrame(uploads))
         return dataset
 
     @staticmethod
-    def clone_models(dataset: dl.Dataset, metrics_path: str, weight_filepath: str):
+    def clone_models(dataset: dl.Dataset, metrics_path: str, weight_filepath: str, progress: dl.Progress):
         filters = dl.Filters(field='app.dpkName', values="resnet", resource=dl.FILTERS_RESOURCE_MODEL)
         filters.add(field='status', values='pre-trained')
         pages = dataset.project.models.list(filters)
@@ -141,6 +157,8 @@ class Loader:
                                  remote_name=f"{model.id}.csv",
                                  remote_path=f"/.modelscores",
                                  overwrite=True)
+            if progress:
+                progress.update(progress=85 + (5 * (i_model + 1)))
 
 
 if __name__ == "__main__":
