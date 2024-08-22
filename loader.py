@@ -94,15 +94,14 @@ class Loader:
                                 item_metadata=item_metadata))
 
         # Upload
-        last_action_value = None
+        progress_tracker = {'last_progress': 0}
 
         def progress_callback(kwargs):
             p = kwargs.get('progress')  # p is between 0-100
-            global last_action_value
             progress_int = round(p / 10) * 10  # round to 10th
-            if progress_int % 10 == 0 and progress_int != last_action_value:
+            if progress_int % 10 == 0 and progress_int != progress_tracker['last_progress']:
                 progress.update(progress=80 * progress_int / 100)
-                last_action_value = progress_int
+                progress_tracker['last_progress'] = progress_int
 
         dl.client_api.callbacks.add(event='itemUpload', func=progress_callback)
         dataset.items.upload(local_path=pd.DataFrame(uploads))
