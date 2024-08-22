@@ -144,4 +144,4 @@ class Loader:
 
 
 if __name__ == "__main__":
-    Loader().run(dl.datasets.get(dataset_id='66c63a7973198484a6e7cfa5'))
+    Loader().run(dl.datasets.get(dataset_id='66c63a7973198484a6e7cfa5'), source="")
