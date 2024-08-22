@@ -96,7 +96,7 @@ class Loader:
         # Upload
         progress_tracker = {'last_progress': 0}
 
-        def progress_callback(kwargs):
+        def progress_callback(**kwargs):
             p = kwargs.get('progress')  # p is between 0-100
             progress_int = round(p / 10) * 10  # round to 10th
             if progress_int % 10 == 0 and progress_int != progress_tracker['last_progress']:
