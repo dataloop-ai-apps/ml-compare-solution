@@ -114,7 +114,10 @@ class Loader:
         pages = dataset.project.models.list(filters)
         if pages.items_count == 0:
             raise ValueError("Couldn't find a pretrained model found for 'resnet' app")
-        pretrained_model = pages.items[0]
+        pretrained_model: dl.Model = pages.items[0]
+        pretrained_model.dataset_id = dataset.id
+        pretrained_model.labels = [label.tag for label in dataset.labels]
+        pretrained_model.update()
         for i_model in range(3):
             model: dl.Model = pretrained_model.clone(model_name=f"agri-classification-v{i_model + 1}",
                                                      dataset=dataset)
