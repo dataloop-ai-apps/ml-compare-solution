@@ -36,7 +36,7 @@
         "modules": [
             {
                 "name": "dataset-adapter",
-                "entryPoint": "loader.py",
+                "entryPoint": "ml_compare_example/loader.py",
                 "className": "Loader",
                 "computeConfig": "dataset-deploy",
                 "description": "Dataset adapter for Kaggle Dataset",
