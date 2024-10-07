@@ -39,10 +39,11 @@ class Loader:
             self.upload_dataset(dataset=dataset,
                                 data_path=data_dir,
                                 progress=progress)
+
     def load_annotated(self, dataset: dl.Dataset, source: str, progress: dl.Progress = None):
         # upload data
         self.upload_data(dataset=dataset, source=source, progress=progress)
-        weight_url = 'https://storage.googleapis.com/model-mgmt-snapshots/datasets-agriculture/artifacts_models_agri-v1_best.pth'
+        weight_url = 'https://storage.googleapis.com/model-mgmt-snapshots/datasets-agriculture/models.zip'
         with tempfile.TemporaryDirectory() as temp_dir:
             if progress:
                 progress.update(message="Preparing data")
@@ -51,18 +52,16 @@ class Loader:
             urlretrieve(weight_url, tmp_zip_path)
             models_dir = os.path.join(temp_dir, 'models')
 
-
             if progress:
                 progress.update(message="Creating models")
             Zipping.unzip_directory(zip_filename=tmp_zip_path,
                                     to_directory=models_dir)
             self.clone_models(dataset=dataset,
                               metrics_path=os.path.join(models_dir, 'metrics'),
-                              weight_filepath=os.path.join(models_dir, 'metrics'),
+                              weight_filepath=os.path.join(models_dir, 'best.pth'),
                               progress=progress)
 
-
-    def upload_data(self, source:str, dataset: dl.Dataset, progress: dl.Progress):
+    def upload_data(self, source: str, dataset: dl.Dataset, progress: dl.Progress):
         with tempfile.TemporaryDirectory() as temp_dir:
             if progress:
                 progress.update(message="Preparing data")
