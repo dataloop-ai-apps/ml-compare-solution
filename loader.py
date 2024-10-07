@@ -96,10 +96,7 @@ class Loader:
 
         # Validations
         if len(item_binaries) != len(annotation_jsons):
-            raise ValueError(
-                f"Number of items ({len(item_binaries)}) "
-                f"is not equal to number of annotation files ({len(annotation_jsons)})"
-            )
+            annotation_jsons = [""] * len(item_binaries)
 
         uploads = list()
         for item_file, annotation_file in zip(item_binaries, annotation_jsons):
@@ -115,11 +112,15 @@ class Loader:
 
             # Construct item remote path
             remote_path = f"/{item_file.parent.stem}"
-
-            uploads.append(dict(local_path=str(item_file),
-                                local_annotations_path=str(annotation_file),
-                                remote_path=remote_path,
-                                item_metadata=item_metadata))
+            if os.path.isfile(annotation_file):
+                uploads.append(dict(local_path=str(item_file),
+                                    local_annotations_path=str(annotation_file),
+                                    remote_path=remote_path,
+                                    item_metadata=item_metadata))
+            else:
+                uploads.append(dict(local_path=str(item_file),
+                                    remote_path=remote_path,
+                                    item_metadata=item_metadata))
 
         # Upload
         progress_tracker = {'last_progress': 0}
