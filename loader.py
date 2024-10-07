@@ -23,17 +23,13 @@ class Loader:
     def __init__(self):
         self.tmp_path = None
 
-    def run(self, dataset: dl.Dataset, source: str, progress: dl.Progress = None):
-        data_url = 'https://storage.googleapis.com/model-mgmt-snapshots/datasets-agriculture/images.zip'
-        weight_url = 'https://storage.googleapis.com/model-mgmt-snapshots/datasets-agriculture/artifacts_models_agri-v1_best.pth'
+    def load_unannotated(self, dataset: dl.Dataset, source: str, progress: dl.Progress = None):
         with tempfile.TemporaryDirectory() as temp_dir:
             if progress:
                 progress.update(message="Preparing data")
             # Downloading
             tmp_zip_path = os.path.join(temp_dir, 'data.zip')
-            tmp_weights_path = os.path.join(temp_dir, 'best.pth')
-            urlretrieve(data_url, tmp_zip_path)
-            urlretrieve(weight_url, tmp_weights_path)
+            urlretrieve(source, tmp_zip_path)
             # Unzip
             data_dir = os.path.join(temp_dir, 'data')
             Zipping.unzip_directory(zip_filename=tmp_zip_path,
@@ -43,12 +39,45 @@ class Loader:
             self.upload_dataset(dataset=dataset,
                                 data_path=data_dir,
                                 progress=progress)
+    def load_annotated(self, dataset: dl.Dataset, source: str, progress: dl.Progress = None):
+        # upload data
+        self.upload_data(dataset=dataset, source=source, progress=progress)
+        weight_url = 'https://storage.googleapis.com/model-mgmt-snapshots/datasets-agriculture/artifacts_models_agri-v1_best.pth'
+        with tempfile.TemporaryDirectory() as temp_dir:
+            if progress:
+                progress.update(message="Preparing data")
+            # Downloading
+            tmp_zip_path = os.path.join(temp_dir, 'models.zip')
+            urlretrieve(weight_url, tmp_zip_path)
+            models_dir = os.path.join(temp_dir, 'models')
+
+
             if progress:
                 progress.update(message="Creating models")
+            Zipping.unzip_directory(zip_filename=tmp_zip_path,
+                                    to_directory=models_dir)
             self.clone_models(dataset=dataset,
-                              metrics_path=os.path.join(data_dir, 'metrics'),
-                              weight_filepath=tmp_weights_path,
+                              metrics_path=os.path.join(models_dir, 'metrics'),
+                              weight_filepath=os.path.join(models_dir, 'metrics'),
                               progress=progress)
+
+
+    def upload_data(self, source:str, dataset: dl.Dataset, progress: dl.Progress):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            if progress:
+                progress.update(message="Preparing data")
+            # Downloading
+            tmp_zip_path = os.path.join(temp_dir, 'data.zip')
+            urlretrieve(source, tmp_zip_path)
+            # Unzip
+            data_dir = os.path.join(temp_dir, 'data')
+            Zipping.unzip_directory(zip_filename=tmp_zip_path,
+                                    to_directory=data_dir)
+            if progress:
+                progress.update(message="Uploading dataset")
+            self.upload_dataset(dataset=dataset,
+                                data_path=data_dir,
+                                progress=progress)
 
     @staticmethod
     def upload_dataset(data_path, dataset: dl.Dataset, progress: dl.Progress):
@@ -161,4 +190,4 @@ class Loader:
 
 
 if __name__ == "__main__":
-    Loader().run(dl.datasets.get(dataset_id='66c63a7973198484a6e7cfa5'), source="")
+    Loader().load_annotated(dl.datasets.get(dataset_id='66c63a7973198484a6e7cfa5'), source="")

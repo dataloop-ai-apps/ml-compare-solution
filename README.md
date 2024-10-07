@@ -13,8 +13,9 @@ The installation also creates 3 trained models with metrics.
 
 ## Components
 
-1. Dataset - V2 Plant Seedlings Dataset
-2. Recipe and ontology - for all the dataset labels
-3. Models - 3 trained classification models
+1. Annotated Dataset - V2 Plant Seedlings Dataset
+2. Unannotated Dataset - V2 Plant Seedlings Dataset
+3. Recipe and ontology - for all the dataset labels
+4. Models - 3 trained classification models
    a. Training metrics (loos and accuracy)
    b. Precision-recall figures
