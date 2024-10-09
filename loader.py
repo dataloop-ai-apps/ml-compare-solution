@@ -96,23 +96,26 @@ class Loader:
 
         # Validations
         if len(item_binaries) != len(annotation_jsons):
-            annotation_jsons = [""] * len(item_binaries)
+            annotation_jsons = [None] * len(item_binaries)
 
         uploads = list()
         for item_file, annotation_file in zip(item_binaries, annotation_jsons):
-            # Load annotation json
-            with open(annotation_file, 'r') as f:
-                annotation_data = json.load(f)
-
-            # Extract tags
-            item_metadata = dict()
-            tags_metadata = annotation_data.get("metadata", dict()).get("system", dict()).get('tags', None)
-            if tags_metadata is not None:
-                item_metadata.update({"system": {"tags": tags_metadata}})
-
             # Construct item remote path
             remote_path = f"/{item_file.parent.stem}"
-            if os.path.isfile(annotation_file):
+            item_metadata = dict()
+
+            if annotation_file is not None and os.path.isfile(annotation_file):
+                # Load annotation json
+                with open(annotation_file, 'r') as f:
+                    annotation_data = json.load(f)
+
+                # Extract tags
+                tags_metadata = annotation_data.get("metadata", dict()).get("system", dict()).get('tags', None)
+                if tags_metadata is not None:
+                    item_metadata.update({"system": {"tags": tags_metadata}})
+
+
+
                 uploads.append(dict(local_path=str(item_file),
                                     local_annotations_path=str(annotation_file),
                                     remote_path=remote_path,
@@ -190,4 +193,8 @@ class Loader:
 
 
 if __name__ == "__main__":
-    Loader().load_annotated(dl.datasets.get(dataset_id='66c63a7973198484a6e7cfa5'), source="")
+    dl.setenv('rc')
+    # Loader().load_annotated(dl.datasets.get(dataset_id='6703d0638af2ef7f6406dea4'),
+    #                         source="https://storage.googleapis.com/model-mgmt-snapshots/datasets-agriculture/annotated.zip")
+    Loader().load_unannotated(dl.datasets.get(dataset_id='6703ca318af2ef4c0a06d84f'),
+                            source="https://storage.googleapis.com/model-mgmt-snapshots/datasets-agriculture/unannotated.zip")
