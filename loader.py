@@ -82,7 +82,7 @@ class Loader:
 
         # Validations
         if len(item_binaries) != len(annotation_jsons):
-            annotation_jsons = [""] * len(item_binaries)
+            annotation_jsons = [None] * len(item_binaries)
 
         uploads = list()
         for item_file, annotation_file in zip(item_binaries, annotation_jsons):
@@ -90,12 +90,14 @@ class Loader:
             remote_path = f"/{item_file.parent.stem}"
 
             # Upload with annotations
-            if os.path.isfile(annotation_file):
+            if annotation_file is not None and os.path.isfile(annotation_file):
+                item_metadata = dict()
+
+                # Load annotation json
                 with open(annotation_file, 'r') as f:
                     annotation_data = json.load(f)
 
                 # Extract tags
-                item_metadata = dict()
                 tags_metadata = annotation_data.get("metadata", dict()).get("system", dict()).get('tags', None)
                 if tags_metadata is not None:
                     item_metadata.update({"system": {"tags": tags_metadata}})
