@@ -24,21 +24,7 @@ class Loader:
         self.tmp_path = None
 
     def load_unannotated(self, dataset: dl.Dataset, source: str, progress: dl.Progress = None):
-        with tempfile.TemporaryDirectory() as temp_dir:
-            if progress:
-                progress.update(message="Preparing data")
-            # Downloading
-            tmp_zip_path = os.path.join(temp_dir, 'data.zip')
-            urlretrieve(source, tmp_zip_path)
-            # Unzip
-            data_dir = os.path.join(temp_dir, 'data')
-            Zipping.unzip_directory(zip_filename=tmp_zip_path,
-                                    to_directory=data_dir)
-            if progress:
-                progress.update(message="Uploading dataset")
-            self.upload_dataset(dataset=dataset,
-                                data_path=data_dir,
-                                progress=progress)
+        self.upload_data(dataset=dataset, source=source, progress=progress)
 
     def load_annotated(self, dataset: dl.Dataset, source: str, progress: dl.Progress = None):
         # upload data
@@ -100,27 +86,28 @@ class Loader:
 
         uploads = list()
         for item_file, annotation_file in zip(item_binaries, annotation_jsons):
-            # Load annotation json
-            with open(annotation_file, 'r') as f:
-                annotation_data = json.load(f)
-
-            # Extract tags
-            item_metadata = dict()
-            tags_metadata = annotation_data.get("metadata", dict()).get("system", dict()).get('tags', None)
-            if tags_metadata is not None:
-                item_metadata.update({"system": {"tags": tags_metadata}})
-
             # Construct item remote path
             remote_path = f"/{item_file.parent.stem}"
+
+            # Upload with annotations
             if os.path.isfile(annotation_file):
+                with open(annotation_file, 'r') as f:
+                    annotation_data = json.load(f)
+
+                # Extract tags
+                item_metadata = dict()
+                tags_metadata = annotation_data.get("metadata", dict()).get("system", dict()).get('tags', None)
+                if tags_metadata is not None:
+                    item_metadata.update({"system": {"tags": tags_metadata}})
+
                 uploads.append(dict(local_path=str(item_file),
                                     local_annotations_path=str(annotation_file),
                                     remote_path=remote_path,
                                     item_metadata=item_metadata))
+            # Upload without annotations
             else:
                 uploads.append(dict(local_path=str(item_file),
-                                    remote_path=remote_path,
-                                    item_metadata=item_metadata))
+                                    remote_path=remote_path))
 
         # Upload
         progress_tracker = {'last_progress': 0}
