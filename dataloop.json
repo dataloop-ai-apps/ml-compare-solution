@@ -128,7 +128,6 @@
         "modules": [
           {
             "name": "resnet-module",
-
             "functions": [
               {
                 "name": "evaluate_model",
