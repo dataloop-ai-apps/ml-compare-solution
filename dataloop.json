@@ -1,110 +1,207 @@
 {
-    "displayName": "ML Comparison Solution",
-    "name": "ml-compare-solution",
-    "description": "Successful cultivation of maize depends largely on the efficacy of weed control. Weed control during the first six to eight weeks after planting is crucial, because weeds compete vigorously with the crop for nutrients and water during this period. Annual yield losses occur as a result of weed infestations in cultivated crops. Crop yield losses that are attributable to weeds vary with type of weed, type of crop, and the environmental conditions involved. Generally, depending on the level of weed control practiced yield losses can vary from 10 to 100 %. Rarely does one experience zero yield loss due to weeds... Yield losses occur as a result of weed interference with the crop's growth and development....This explains why effective weed control is imperative. In order to do effective control the first critical requirement is correct weed identification",
-    "scope": "public",
-    "version": "0.0.15",
-    "codebase": {
-        "type": "git",
-        "gitUrl": "https://github.com/dataloop-ai-apps/ml-compare-solution.git",
-        "gitTag": "0.0.15"
-    },
-    "attributes": {
-        "Category": "Dataset",
-        "Hub": "Dataloop",
-        "Media Type": ["Image"],
-        "Annotation Type": ["Classification"],
-        "Computer Vision": "Classification",
-        "License": "CC BY-SA 4.0"
-    },
-    "components": {
+  "displayName": "ML Comparison Solution",
+  "name": "ml-compare-solution",
+  "description": "Successful cultivation of maize depends largely on the efficacy of weed control. Weed control during the first six to eight weeks after planting is crucial, because weeds compete vigorously with the crop for nutrients and water during this period. Annual yield losses occur as a result of weed infestations in cultivated crops. Crop yield losses that are attributable to weeds vary with type of weed, type of crop, and the environmental conditions involved. Generally, depending on the level of weed control practiced yield losses can vary from 10 to 100 %. Rarely does one experience zero yield loss due to weeds... Yield losses occur as a result of weed interference with the crop's growth and development....This explains why effective weed control is imperative. In order to do effective control the first critical requirement is correct weed identification",
+  "scope": "public",
+  "version": "0.0.15",
+  "codebase": {
+    "type": "git",
+    "gitUrl": "https://github.com/dataloop-ai-apps/ml-compare-solution.git",
+    "gitTag": "0.0.15"
+  },
+  "attributes": {
+    "Category": "Dataset",
+    "Hub": "Dataloop",
+    "Media Type": ["Image"],
+    "Annotation Type": ["Classification"],
+    "Computer Vision": "Classification",
+    "License": "CC BY-SA 4.0"
+  },
+  "components": {
+    "computeConfigs": [
+      {
+        "name": "dataset-deploy",
+        "runtime": {
+          "podType": "regular-xs",
+          "concurrency": 10,
+          "autoscaler": {
+            "type": "rabbitmq",
+            "minReplicas": 0,
+            "maxReplicas": 1,
+            "queueLength": 100
+          }
+        }
+      }
+    ],
+    "modules": [
+      {
+        "name": "dataset-adapter",
+        "entryPoint": "loader.py",
+        "className": "Loader",
+        "computeConfig": "dataset-deploy",
+        "description": "Dataset adapter for Kaggle Dataset",
+        "initInputs": [],
+        "functions": [
+          {
+            "name": "load_annotated",
+            "input": [
+              {
+                "type": "Dataset",
+                "name": "dataset",
+                "description": "Dataloop Dataset Entity"
+              },
+              {
+                "type": "String",
+                "name": "source",
+                "description": "Dataset source URL"
+              }
+            ],
+            "output": [],
+            "displayName": "Upload Annotated Dataset",
+            "displayIcon": "",
+            "description": "Function to upload dataset to Dataloop"
+          },
+          {
+            "name": "load_unannotated",
+            "input": [
+              {
+                "type": "Dataset",
+                "name": "dataset",
+                "description": "Dataloop Dataset Entity"
+              },
+              {
+                "type": "String",
+                "name": "source",
+                "description": "Dataset source URL"
+              }
+            ],
+            "output": [],
+            "displayName": "Upload Unannotated Dataset",
+            "displayIcon": "",
+            "description": "Function to upload dataset to Dataloop"
+          }
+        ]
+      }
+    ],
+    "datasets": [
+      {
+        "name": "V2 Plant Seedlings - Annotated",
+        "docs": "https://www.kaggle.com/datasets/vbookshelf/v2-plant-seedlings-dataset",
+        "source": "https://storage.googleapis.com/model-mgmt-snapshots/datasets-agriculture/annotated.zip",
+        "invoke": {
+          "namespace": "dataset-adapter.load_annotated"
+        }
+      },
+      {
+        "name": "V2 Plant Seedlings - Unannotated",
+        "docs": "https://www.kaggle.com/datasets/vbookshelf/v2-plant-seedlings-dataset",
+        "source": "https://storage.googleapis.com/model-mgmt-snapshots/datasets-agriculture/unannotated.zip",
+        "invoke": {
+          "namespace": "dataset-adapter.load_unannotated"
+        }
+      }
+    ]
+  },
+  "dependencies": [
+    {
+      "name": "resnet",
+      "components": {
         "computeConfigs": [
-            {
-                "name": "dataset-deploy",
-                "runtime": {
-                    "podType": "regular-xs",
-                    "concurrency": 10,
-                    "autoscaler": {
-                        "type": "rabbitmq",
-                        "minReplicas": 0,
-                        "maxReplicas": 1,
-                        "queueLength": 100
-                    }
-                }
+          {
+            "name": "resnet-deploy"
+          },
+          {
+            "name": "resnet-train-evaluate",
+            "runtime": {
+              "podType": "regular-m",
+              "concurrency": 1,
+              "runnerImage": "gcr.io/viewo-g/piper/agent/runner/apps/torch-models:0.1.4",
+              "autoscaler": {
+                "type": "rabbitmq",
+                "minReplicas": 0,
+                "maxReplicas": 2,
+                "queueLength": 100
+              }
             }
+          }
         ],
         "modules": [
-            {
-                "name": "dataset-adapter",
-                "entryPoint": "loader.py",
-                "className": "Loader",
-                "computeConfig": "dataset-deploy",
-                "description": "Dataset adapter for Kaggle Dataset",
-                "initInputs": [],
-                "functions": [
-                    {
-                        "name": "load_annotated",
-                        "input": [
-                            {
-                                "type": "Dataset",
-                                "name": "dataset",
-                                "description": "Dataloop Dataset Entity"
-                            },
-                            {
-                                "type": "String",
-                                "name": "source",
-                                "description": "Dataset source URL"
-                            }
-                        ],
-                        "output": [],
-                        "displayName": "Upload Annotated Dataset",
-                        "displayIcon": "",
-                        "description": "Function to upload dataset to Dataloop"
-                    },
-                     {
-                        "name": "load_unannotated",
-                        "input": [
-                            {
-                                "type": "Dataset",
-                                "name": "dataset",
-                                "description": "Dataloop Dataset Entity"
-                            },
-                            {
-                                "type": "String",
-                                "name": "source",
-                                "description": "Dataset source URL"
-                            }
-                        ],
-                        "output": [],
-                        "displayName": "Upload Unannotated Dataset",
-                        "displayIcon": "",
-                        "description": "Function to upload dataset to Dataloop"
-                    }
-                ]
-            }
+          {
+            "name": "resnet-module",
+
+            "functions": [
+              {
+                "name": "evaluate_model",
+                "computeConfig": "resnet-train-evaluate",
+                "input": [
+                  {
+                    "type": "Model",
+                    "name": "model",
+                    "description": "Dataloop Model Entity"
+                  },
+                  {
+                    "type": "Dataset",
+                    "name": "dataset",
+                    "description": "Dataloop Dataset Entity"
+                  },
+                  {
+                    "type": "Json",
+                    "name": "filters",
+                    "description": "Dataloop Filter DQL"
+                  }
+                ],
+                "output": [
+                  {
+                    "type": "Model",
+                    "name": "model",
+                    "description": "Dataloop Model Entity"
+                  },
+                  {
+                    "type": "Dataset",
+                    "name": "dataset",
+                    "description": "Dataloop Dataset Entity"
+                  }
+                ],
+                "displayName": "Evaluate a Model",
+                "displayIcon": "",
+                "description": "Function to evaluate Resnet model performance"
+              },
+              {
+                "name": "predict_items"
+              },
+              {
+                "name": "train_model",
+                "computeConfig": "resnet-train-evaluate",
+                "input": [
+                  {
+                    "type": "Model",
+                    "name": "model",
+                    "description": "Dataloop Model Entity"
+                  }
+                ],
+                "output": [
+                  {
+                    "type": "Model",
+                    "name": "model",
+                    "description": "Dataloop Model Entity"
+                  }
+                ],
+                "displayName": "Train a Model",
+                "displayIcon": "",
+                "description": "Function to train Resnet model"
+              },
+              {
+                "name": "predict_dataset"
+              }
+            ]
+          }
         ],
-        "datasets": [
-            {
-                "name": "V2 Plant Seedlings - Annotated",
-                "docs": "https://www.kaggle.com/datasets/vbookshelf/v2-plant-seedlings-dataset",
-                "source": "https://storage.googleapis.com/model-mgmt-snapshots/datasets-agriculture/annotated.zip",
-                "invoke": {
-                    "namespace": "dataset-adapter.load_annotated"
-                }
-            },
-            {
-                "name": "V2 Plant Seedlings - Unannotated",
-                "docs": "https://www.kaggle.com/datasets/vbookshelf/v2-plant-seedlings-dataset",
-                "source": "https://storage.googleapis.com/model-mgmt-snapshots/datasets-agriculture/unannotated.zip",
-                "invoke": {
-                    "namespace": "dataset-adapter.load_unannotated"
-                }
-            }
+        "models": [
+          {
+            "name": "pretrained-resnet"
+          }
         ]
-    },
-    "dependencies": [
-        {
-            "name": "resnet"
-        }
-    ]
+      }
+    }
+  ]
 }
