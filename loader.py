@@ -24,21 +24,7 @@ class Loader:
         self.tmp_path = None
 
     def load_unannotated(self, dataset: dl.Dataset, source: str, progress: dl.Progress = None):
-        with tempfile.TemporaryDirectory() as temp_dir:
-            if progress:
-                progress.update(message="Preparing data")
-            # Downloading
-            tmp_zip_path = os.path.join(temp_dir, 'data.zip')
-            urlretrieve(source, tmp_zip_path)
-            # Unzip
-            data_dir = os.path.join(temp_dir, 'data')
-            Zipping.unzip_directory(zip_filename=tmp_zip_path,
-                                    to_directory=data_dir)
-            if progress:
-                progress.update(message="Uploading dataset")
-            self.upload_dataset(dataset=dataset,
-                                data_path=data_dir,
-                                progress=progress)
+        self.upload_data(dataset=dataset, source=source, progress=progress)
 
     def load_annotated(self, dataset: dl.Dataset, source: str, progress: dl.Progress = None):
         # upload data
@@ -102,9 +88,11 @@ class Loader:
         for item_file, annotation_file in zip(item_binaries, annotation_jsons):
             # Construct item remote path
             remote_path = f"/{item_file.parent.stem}"
-            item_metadata = dict()
 
+            # Upload with annotations
             if annotation_file is not None and os.path.isfile(annotation_file):
+                item_metadata = dict()
+
                 # Load annotation json
                 with open(annotation_file, 'r') as f:
                     annotation_data = json.load(f)
@@ -114,16 +102,14 @@ class Loader:
                 if tags_metadata is not None:
                     item_metadata.update({"system": {"tags": tags_metadata}})
 
-
-
                 uploads.append(dict(local_path=str(item_file),
                                     local_annotations_path=str(annotation_file),
                                     remote_path=remote_path,
                                     item_metadata=item_metadata))
+            # Upload without annotations
             else:
                 uploads.append(dict(local_path=str(item_file),
-                                    remote_path=remote_path,
-                                    item_metadata=item_metadata))
+                                    remote_path=remote_path))
 
         # Upload
         progress_tracker = {'last_progress': 0}
@@ -193,8 +179,4 @@ class Loader:
 
 
 if __name__ == "__main__":
-    dl.setenv('rc')
-    # Loader().load_annotated(dl.datasets.get(dataset_id='6703d0638af2ef7f6406dea4'),
-    #                         source="https://storage.googleapis.com/model-mgmt-snapshots/datasets-agriculture/annotated.zip")
-    Loader().load_unannotated(dl.datasets.get(dataset_id='6703ca318af2ef4c0a06d84f'),
-                            source="https://storage.googleapis.com/model-mgmt-snapshots/datasets-agriculture/unannotated.zip")
+    Loader().load_annotated(dl.datasets.get(dataset_id='66c63a7973198484a6e7cfa5'), source="")
