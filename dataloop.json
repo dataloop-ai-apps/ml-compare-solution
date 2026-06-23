@@ -11,7 +11,7 @@
     },
     "attributes": {
         "Category": "Dataset",
-        "Hub": "Dataloop",
+        "Hub": "DDOE",
         "Media Type": [
             "Image"
         ],
@@ -52,7 +52,7 @@
                             {
                                 "type": "Dataset",
                                 "name": "dataset",
-                                "description": "Dataloop Dataset Entity"
+                                "description": "DDOE Dataset Entity"
                             },
                             {
                                 "type": "String",
@@ -63,7 +63,7 @@
                         "output": [],
                         "displayName": "Upload Annotated Dataset",
                         "displayIcon": "",
-                        "description": "Function to upload dataset to Dataloop"
+                        "description": "Function to upload dataset to DDOE"
                     },
                     {
                         "name": "load_unannotated",
@@ -71,7 +71,7 @@
                             {
                                 "type": "Dataset",
                                 "name": "dataset",
-                                "description": "Dataloop Dataset Entity"
+                                "description": "DDOE Dataset Entity"
                             },
                             {
                                 "type": "String",
@@ -82,7 +82,7 @@
                         "output": [],
                         "displayName": "Upload Unannotated Dataset",
                         "displayIcon": "",
-                        "description": "Function to upload dataset to Dataloop"
+                        "description": "Function to upload dataset to DDOE"
                     }
                 ]
             }
@@ -139,29 +139,29 @@
                                     {
                                         "type": "Model",
                                         "name": "model",
-                                        "description": "Dataloop Model Entity"
+                                        "description": "DDOE Model Entity"
                                     },
                                     {
                                         "type": "Dataset",
                                         "name": "dataset",
-                                        "description": "Dataloop Dataset Entity"
+                                        "description": "DDOE Dataset Entity"
                                     },
                                     {
                                         "type": "Json",
                                         "name": "filters",
-                                        "description": "Dataloop Filter DQL"
+                                        "description": "DDOE Filter DQL"
                                     }
                                 ],
                                 "output": [
                                     {
                                         "type": "Model",
                                         "name": "model",
-                                        "description": "Dataloop Model Entity"
+                                        "description": "DDOE Model Entity"
                                     },
                                     {
                                         "type": "Dataset",
                                         "name": "dataset",
-                                        "description": "Dataloop Dataset Entity"
+                                        "description": "DDOE Dataset Entity"
                                     }
                                 ],
                                 "displayName": "Evaluate a Model",
@@ -178,14 +178,14 @@
                                     {
                                         "type": "Model",
                                         "name": "model",
-                                        "description": "Dataloop Model Entity"
+                                        "description": "DDOE Model Entity"
                                     }
                                 ],
                                 "output": [
                                     {
                                         "type": "Model",
                                         "name": "model",
-                                        "description": "Dataloop Model Entity"
+                                        "description": "DDOE Model Entity"
                                     }
                                 ],
                                 "displayName": "Train a Model",

@@ -1,6 +1,6 @@
 # ML Comparison Solution
 
-Welcome to the ML Comparison Solution repository, an application designed to showcase the capabilities of the Dataloop platform in managing and evaluating machine learning models. This solution is available under the `Datasets` tab in the Dataloop Marketplace and leverages the V2 Plant Seedlings Dataset from Kaggle.
+Welcome to the ML Comparison Solution repository, an application designed to showcase the capabilities of the DDOE platform in managing and evaluating machine learning models. This solution is available under the `Datasets` tab in the DDOE Marketplace and leverages the V2 Plant Seedlings Dataset from Kaggle.
 
 ## Table of Contents
 
@@ -25,7 +25,7 @@ The ML Comparison Solution utilizes a machine learning model, specifically ResNe
 
 To install the ML Comparison Solution app:
 
-1. Navigate to the **Marketplace** on the Dataloop platform.
+1. Navigate to the **Marketplace** on the DDOE platform.
 2. Select the **Datasets** tab.
 3. Search for the "ML Comparison Solution" app.
 4. Click on **Install** to add the solution to your workspace.
@@ -48,10 +48,10 @@ The solution comprises several key components:
 
 The `Loader` class in `loader.py` is the core of the code. It includes methods to load both annotated and unannotated datasets, as well as to clone and evaluate pre-trained models. Key methods include:
 
-- `upload_dataset`: Create an ontology and upload the dataset to the Dataloop platform.
-- `upload_data`: Uploads the dataset to the Dataloop platform (by calling the upload_dataset function).
+- `upload_dataset`: Create an ontology and upload the dataset to the DDOE platform.
+- `upload_data`: Uploads the dataset to the DDOE platform (by calling the upload_dataset function).
 - `load_unannotated`: Uploads the unannotated datasets (by calling the upload_data function).
-- `clone_models`: Clones an existing Resnet model and create 3 new models inside the projects (with names agri-classification-v1, agri-classification-v2, agri-classification-v3). The function is used to replicate an evaluation of a model (by getting pre-computed metrics and plots) done on a specific dataset and to show the model comparison possibilities in the Dataloop plaform.
+- `clone_models`: Clones an existing Resnet model and create 3 new models inside the projects (with names agri-classification-v1, agri-classification-v2, agri-classification-v3). The function is used to replicate an evaluation of a model (by getting pre-computed metrics and plots) done on a specific dataset and to show the model comparison possibilities in the DDOE plaform.
 - `load_annotated`: Uploads the annotated datasets (by calling the upload_data function), retrieve models metrics and calls the clone_models function.
 
 
@@ -62,7 +62,7 @@ The `dataloop.json` file serves as the core configuration for the solution. It d
 ### Key Components
 
 #### 1. App Information
-- **Display Name**: Name as it will be displayed in the Dataloop platform.
+- **Display Name**: Name as it will be displayed in the DDOE platform.
 - **Name**: Name of the dpk behind the app.
 - **Description**: App description.
 - **Scope**: App scope can be public (for all users) or project (for a specific project).
@@ -109,7 +109,7 @@ The app utilizes two versions of the **V2 Plant Seedlings Dataset** from Kaggle:
 
 #### 4. Dependencies
 - Includes a simplified `dataloop.json` configuration for a **ResNet model adapter**, focusing on relevant functions.
-- For a full implementation, refer to the **ResNet app** in the [Dataloop Apps GitHub 'torch-models' repository](https://github.com/dataloop-ai-apps/torch-models).
+- For a full implementation, refer to the **ResNet app** in the [DDOE Apps GitHub 'torch-models' repository](https://github.com/dataloop-ai-apps/torch-models).
 
 
 ## Additional Information
